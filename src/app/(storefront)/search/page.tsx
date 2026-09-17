@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { ProductCard } from "@/components/product-card";
+import { currentUser } from "@/lib/permissions";
 
 export default async function SearchPage({
   searchParams,
@@ -7,6 +8,7 @@ export default async function SearchPage({
   searchParams: Promise<{ q?: string; cat?: string; sort?: string }>;
 }) {
   const { q = "", cat = "", sort = "new" } = await searchParams;
+  const user = await currentUser();
 
   const products = await db.product.findMany({
     where: {
@@ -30,7 +32,14 @@ export default async function SearchPage({
       <h1 className="text-xl font-bold">Search{q ? `: ${q}` : ""}</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
+          <ProductCard
+            key={p.id}
+            product={p}
+            canEdit={
+              user?.role === "ADMIN" ||
+              (user?.role === "SELLER" && p.store.ownerId === user.id)
+            }
+          />
         ))}
       </div>
     </div>

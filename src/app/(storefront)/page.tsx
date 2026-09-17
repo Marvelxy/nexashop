@@ -1,9 +1,9 @@
 import { db } from "@/lib/db";
 import { ProductCard } from "@/components/product-card";
-
-export const revalidate = 60; // ISR: revalidate homepage every 60s
+import { currentUser } from "@/lib/permissions";
 
 export default async function HomePage() {
+  const user = await currentUser();
   const products = await db.product.findMany({
     where: { isPublished: true, store: { isApproved: true } },
     include: { store: true, category: true },
@@ -19,7 +19,14 @@ export default async function HomePage() {
       </section>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
+          <ProductCard
+            key={p.id}
+            product={p}
+            canEdit={
+              user?.role === "ADMIN" ||
+              (user?.role === "SELLER" && p.store.ownerId === user.id)
+            }
+          />
         ))}
         {products.length === 0 && (
           <p className="text-sm text-neutral-500">

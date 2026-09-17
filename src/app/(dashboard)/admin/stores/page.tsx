@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/permissions";
 import { approveStore, removeStore } from "@/actions/admin";
@@ -15,7 +16,12 @@ export default async function AdminStoresPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold">Approve stores</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">Approve stores</h1>
+        <Link href="/admin/products" className="text-sm underline">
+          Manage products
+        </Link>
+      </div>
       {stores.length === 0 && <p className="text-sm text-neutral-500">No stores yet.</p>}
       {stores.map((s) => (
         <div key={s.id} className="border rounded p-3 text-sm">

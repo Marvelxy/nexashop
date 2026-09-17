@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/permissions";
 import { createStore } from "@/actions/store";
+import { togglePublish } from "@/actions/product";
 
 export default async function SellerProductsPage() {
   const user = await currentUser();
@@ -49,7 +51,15 @@ export default async function SellerProductsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold">{store.name} — Products</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">{store.name} — Products</h1>
+        <Link
+          href="/seller/products/new"
+          className="rounded bg-neutral-900 px-3 py-2 text-sm text-white"
+        >
+          Add product
+        </Link>
+      </div>
 
       {!store.isApproved && (
         <p className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
@@ -60,9 +70,33 @@ export default async function SellerProductsPage() {
 
       <ul className="divide-y border rounded">
         {store.products.map((p) => (
-          <li key={p.id} className="p-3 flex justify-between text-sm">
+          <li key={p.id} className="p-3 flex justify-between items-center gap-4 text-sm">
             <span>{p.name}</span>
-            <span>{p.isPublished ? "Live" : "Draft"} — {p.stock} in stock</span>
+            <div className="flex items-center gap-3">
+              <span>{p.isPublished ? "Live" : "Draft"} — {p.stock} in stock</span>
+              <Link
+                href={`/seller/products/${p.id}/edit`}
+                className="rounded border border-neutral-300 px-3 py-1 text-xs"
+              >
+                Edit
+              </Link>
+              <form action={async (formData) => {
+                "use server";
+                await togglePublish(formData.get("id") as string);
+              }}>
+                <input type="hidden" name="id" value={p.id} />
+                <button
+                  type="submit"
+                  className={
+                    p.isPublished
+                      ? "rounded border border-neutral-300 px-3 py-1 text-xs"
+                      : "rounded bg-green-600 px-3 py-1 text-xs text-white"
+                  }
+                >
+                  {p.isPublished ? "Unpublish" : "Publish"}
+                </button>
+              </form>
+            </div>
           </li>
         ))}
         {store.products.length === 0 && (

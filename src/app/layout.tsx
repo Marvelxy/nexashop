@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthNav } from "@/components/auth-nav";
+import { currentUser } from "@/lib/permissions";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -8,7 +9,9 @@ export const metadata: Metadata = {
   description: "Buy from independent sellers. Built with Next.js 15.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const user = await currentUser();
+
   return (
     <html lang="en">
       <body
@@ -22,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <a href="/search">Search</a>
               <a href="/cart">Cart</a>
               <a href="/seller/products">Sell</a>
-              <a href="/admin/stores">Admin</a>
+              {user?.role === "ADMIN" && <a href="/admin/stores">Admin</a>}
               <AuthNav />
             </div>
           </nav>

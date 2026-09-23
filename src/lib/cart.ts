@@ -18,7 +18,7 @@ export type CartLineWithProduct = CartLine & {
     stock: number;
     images: string[];
     isPublished: boolean;
-    store: { name: string };
+    store: { id: string; name: string };
   };
 };
 
@@ -101,7 +101,7 @@ export async function getDetailedCart(): Promise<{
         stock: p.stock,
         images,
         isPublished: p.isPublished,
-        store: { name: p.store.name },
+        store: { id: p.store.id, name: p.store.name },
       },
     });
   }

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Pencil1Icon } from "@radix-ui/react-icons";
 import { formatPrice, currentUser } from "@/lib/permissions";
 import { AddToCartForm } from "@/components/add-to-cart-form";
+import { StockBadge, isOutOfStock } from "@/components/stock-badge";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -45,18 +46,25 @@ export default async function ProductPage({ params }: Props) {
       ? product.reviews.reduce((s, r) => s + r.rating, 0) / product.reviews.length
       : 0;
 
+  const outOfStock = isOutOfStock(product.stock);
+
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <div>
         {image ? (
           <div className="space-y-2">
-            <div className="aspect-square bg-neutral-100 rounded overflow-hidden">
+            <div className="relative aspect-square bg-neutral-100 rounded overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={image}
                 alt={product.name}
-                className="h-full w-full object-cover"
+                className={`h-full w-full object-cover ${outOfStock ? "grayscale opacity-60" : ""}`}
               />
+              {outOfStock && (
+                <span className="absolute inset-x-0 bottom-0 bg-neutral-900/80 py-2 text-center text-sm font-medium text-white">
+                  Out of stock
+                </span>
+              )}
             </div>
             {images.slice(1).length > 0 && (
               <div className="flex gap-2">
@@ -90,7 +98,10 @@ export default async function ProductPage({ params }: Props) {
         </div>
         <h1 className="text-2xl font-bold">{product.name}</h1>
         <p className="text-xl">{formatPrice(product.price)}</p>
-        <p className="text-sm">Stock: {product.stock}</p>
+        <div className="flex items-center gap-2">
+          <StockBadge stock={product.stock} />
+          <p className="text-sm text-neutral-500">Stock: {product.stock}</p>
+        </div>
         <p className="text-sm">Rating: {avg.toFixed(1)} ({product.reviews.length})</p>
         <p className="text-neutral-700">{product.description}</p>
         <AddToCartForm productId={product.id} stock={product.stock} />

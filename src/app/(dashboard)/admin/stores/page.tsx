@@ -18,9 +18,14 @@ export default async function AdminStoresPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Approve stores</h1>
-        <Link href="/admin/products" className="text-sm underline">
-          Manage products
-        </Link>
+        <div className="flex gap-3 text-sm">
+          <Link href="/admin/orders" className="underline">
+            Manage orders
+          </Link>
+          <Link href="/admin/products" className="underline">
+            Manage products
+          </Link>
+        </div>
       </div>
       {stores.length === 0 && <p className="text-sm text-neutral-500">No stores yet.</p>}
       {stores.map((s) => (

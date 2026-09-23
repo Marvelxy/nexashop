@@ -143,13 +143,14 @@ model Order {
   store           Store       @relation(fields: [storeId], references: [id])
   status          OrderStatus @default(PENDING)
   total           Int // cents
-  stripeSessionId String?     @unique
+  stripeSessionId String?
   items           OrderItem[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
   @@index([buyerId])
   @@index([storeId])
+  @@index([stripeSessionId])
 }
 
 model OrderItem {

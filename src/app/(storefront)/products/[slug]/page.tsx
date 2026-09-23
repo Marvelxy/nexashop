@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Pencil1Icon } from "@radix-ui/react-icons";
 import { formatPrice, currentUser } from "@/lib/permissions";
+import { AddToCartForm } from "@/components/add-to-cart-form";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -92,6 +93,7 @@ export default async function ProductPage({ params }: Props) {
         <p className="text-sm">Stock: {product.stock}</p>
         <p className="text-sm">Rating: {avg.toFixed(1)} ({product.reviews.length})</p>
         <p className="text-neutral-700">{product.description}</p>
+        <AddToCartForm productId={product.id} stock={product.stock} />
       </div>
     </div>
   );

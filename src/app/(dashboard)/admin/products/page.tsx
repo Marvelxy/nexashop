@@ -18,9 +18,14 @@ export default async function AdminProductsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Products</h1>
-        <Link href="/admin/stores" className="text-sm underline">
-          Manage stores
-        </Link>
+        <div className="flex gap-3 text-sm">
+          <Link href="/admin/orders" className="underline">
+            Manage orders
+          </Link>
+          <Link href="/admin/stores" className="underline">
+            Manage stores
+          </Link>
+        </div>
       </div>
 
       {products.length === 0 && <p className="text-sm text-neutral-500">No products yet.</p>}

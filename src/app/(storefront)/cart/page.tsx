@@ -61,6 +61,16 @@ export default async function CartPage() {
                   <CartRemoveButton productId={product.id} />
                 </div>
                 <p className="text-sm">{formatPrice(product.price)} each</p>
+                {product.stock < 1 && (
+                  <p className="text-xs font-medium text-red-600">
+                    Out of stock — remove it or wait for restock.
+                  </p>
+                )}
+                {product.stock >= 1 && qty > product.stock && (
+                  <p className="text-xs font-medium text-amber-600">
+                    Only {product.stock} available — lower the quantity.
+                  </p>
+                )}
                 <div className="flex items-center justify-between">
                   <CartQtyForm
                     productId={product.id}

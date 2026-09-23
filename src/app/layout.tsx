@@ -24,6 +24,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Link href="/" className="font-bold text-lg">NexaShop</Link>
             <div className="flex gap-4 text-sm">
               <a href="/search">Search</a>
+              {user && <Link href="/orders">Orders</Link>}
               <a href="/cart">
                 <CartCount />
               </a>

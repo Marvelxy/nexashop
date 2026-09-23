@@ -66,7 +66,7 @@ export function QuickAddButton({
         aria-label="Add to cart"
         className="w-full rounded border px-3 py-1.5 text-sm hover:bg-neutral-50 disabled:opacity-50"
       >
-        {pending ? "Adding…" : "Add to cart"}
+        {disabled ? "Out of stock" : pending ? "Adding…" : "Add to cart"}
       </button>
       {state.error && <p className="mt-1 text-xs text-red-600">{state.error}</p>}
     </form>

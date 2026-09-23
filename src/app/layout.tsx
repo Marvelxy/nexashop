@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthNav } from "@/components/auth-nav";
+import { CartCount } from "@/components/cart-count";
 import { currentUser } from "@/lib/permissions";
 import "./globals.css";
 
@@ -23,7 +24,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Link href="/" className="font-bold text-lg">NexaShop</Link>
             <div className="flex gap-4 text-sm">
               <a href="/search">Search</a>
-              <a href="/cart">Cart</a>
+              <a href="/cart">
+                <CartCount />
+              </a>
               <a href="/seller/products">Sell</a>
               {user?.role === "ADMIN" && <a href="/admin/stores">Admin</a>}
               <AuthNav />

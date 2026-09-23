@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Pencil1Icon } from "@radix-ui/react-icons";
 import { formatPrice } from "@/lib/permissions";
+import { QuickAddButton } from "@/components/add-to-cart-form";
 
 type Product = {
   id: string;
@@ -46,6 +47,7 @@ export function ProductCard({
         <Link href={`/products/${product.slug}`}>{product.name}</Link>
       </h3>
       <p>{formatPrice(product.price)}</p>
+      <QuickAddButton productId={product.id} />
     </div>
   );
 }

@@ -11,9 +11,13 @@ export function isLowStock(stock: number) {
 export function StockBadge({ stock }: { stock: number }) {
   if (isOutOfStock(stock)) {
     return (
-      <span className="inline-block rounded bg-neutral-900 px-2 py-0.5 text-xs font-medium text-white">
-        Out of stock
-      </span>
+      <>
+        {/*
+          <span className="inline-block rounded bg-neutral-900 px-2 py-0.5 text-xs font-medium text-white">
+            Out of stock
+          </span>
+        */}
+      </>
     );
   }
   if (isLowStock(stock)) {
@@ -24,8 +28,10 @@ export function StockBadge({ stock }: { stock: number }) {
     );
   }
   return (
-    <span className="inline-block rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+    <>
+      {/*<span className="inline-block rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
       In stock
-    </span>
+    </span>*/}
+    </>
   );
 }

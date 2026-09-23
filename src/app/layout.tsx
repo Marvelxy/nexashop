@@ -23,7 +23,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <nav className="mx-auto flex max-w-6xl items-center justify-between p-4">
             <Link href="/" className="font-bold text-lg">NexaShop</Link>
             <div className="flex gap-4 text-sm">
-              <a href="/search">Search</a>
               {user && <Link href="/orders">Orders</Link>}
               <a href="/cart">
                 <CartCount />

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { AuthNav } from "@/components/auth-nav";
-import { CartCount } from "@/components/cart-count";
+import { SiteHeader, type HeaderUser } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { currentUser } from "@/lib/permissions";
+import { getCartCount } from "@/lib/cart";
+import { db } from "@/lib/db";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,7 +12,21 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const user = await currentUser();
+  const [user, categories, cartCount] = await Promise.all([
+    currentUser(),
+    db.category.findMany({ orderBy: { name: "asc" } }),
+    getCartCount(),
+  ]);
+
+  const headerUser: HeaderUser | null = user
+    ? {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image,
+        role: user.role,
+      }
+    : null;
 
   return (
     <html lang="en">
@@ -19,21 +34,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         className="min-h-screen bg-white text-neutral-900 antialiased"
         suppressHydrationWarning
       >
-        <header className="border-b">
-          <nav className="mx-auto flex max-w-6xl items-center justify-between p-4">
-            <Link href="/" className="font-bold text-lg">NexaShop</Link>
-            <div className="flex gap-4 text-sm">
-              {user && <Link href="/orders">Orders</Link>}
-              <a href="/cart">
-                <CartCount />
-              </a>
-              <a href="/seller/products">Sell</a>
-              {user?.role === "ADMIN" && <a href="/admin/stores">Admin</a>}
-              <AuthNav />
-            </div>
-          </nav>
-        </header>
-        <main className="mx-auto max-w-6xl p-4">{children}</main>
+        <SiteHeader user={headerUser} categories={categories} cartCount={cartCount} />
+        <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
+        <SiteFooter categories={categories} />
       </body>
     </html>
   );

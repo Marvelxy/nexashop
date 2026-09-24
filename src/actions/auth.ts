@@ -3,7 +3,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { z } from "zod";
 import { AuthError } from "next-auth";
-import { signIn } from "@/lib/auth";
+import { signIn, signOut as nextSignOut } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { sendPasswordResetEmail } from "@/lib/email";
@@ -138,4 +138,8 @@ export async function resetPassword(_prev: AuthState, formData: FormData): Promi
   }
 
   return { success: "Password updated" };
+}
+
+export async function signOutAction(): Promise<void> {
+  await nextSignOut({ redirectTo: "/" });
 }

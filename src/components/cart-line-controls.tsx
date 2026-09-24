@@ -24,25 +24,27 @@ export function CartQtyForm({
   );
 
   return (
-    <form action={formAction} className="flex items-center gap-2">
+    <form action={formAction} className="flex flex-wrap items-center gap-2">
       <input type="hidden" name="productId" value={productId} />
-      <input
-        name="qty"
-        type="number"
-        min={0}
-        max={Math.min(max, 99)}
-        defaultValue={qty}
-        aria-label="Quantity"
-        className="w-20 rounded border px-2 py-1 text-sm"
-      />
+      <span className="flex items-center rounded-full border border-neutral-200 bg-white">
+        <input
+          name="qty"
+          type="number"
+          min={0}
+          max={Math.min(max, 99)}
+          defaultValue={qty}
+          aria-label="Quantity"
+          className="w-16 bg-transparent px-3 py-1.5 text-center text-sm focus:outline-none"
+        />
+      </span>
       <button
         type="submit"
         disabled={pending}
-        className="rounded border px-3 py-1 text-sm hover:bg-neutral-50 disabled:opacity-50"
+        className="rounded-full border border-neutral-200 px-3.5 py-1.5 text-xs font-medium transition hover:border-neutral-900 disabled:opacity-50"
       >
         {pending ? "Saving…" : "Update"}
       </button>
-      {state.error && <span className="text-xs text-red-600">{state.error}</span>}
+      {state.error && <span className="w-full text-xs text-red-600">{state.error}</span>}
     </form>
   );
 }
@@ -56,9 +58,12 @@ export function CartRemoveButton({ productId }: { productId: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="text-sm text-red-600 hover:underline disabled:opacity-50"
+        aria-label="Remove item"
+        className="rounded-full p-1.5 text-neutral-400 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
       >
-        {pending ? "Removing…" : "Remove"}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        </svg>
       </button>
     </form>
   );

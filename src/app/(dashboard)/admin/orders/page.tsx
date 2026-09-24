@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { currentUser, formatPrice } from "@/lib/permissions";
+import { EmptyState, OrderStatusBadge, PageHeader, Stat, Tabs } from "@/components/dashboard-ui";
 
 const STATUSES = [
   "PENDING",
@@ -26,35 +27,45 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
     ? status!
     : undefined;
 
-  const orders = await db.order.findMany({
-    where: activeStatus ? { status: activeStatus as (typeof STATUSES)[number] } : undefined,
-    include: {
-      buyer: { select: { email: true, name: true } },
-      store: { select: { name: true } },
-      _count: { select: { items: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 100,
+  const [orders, total] = await Promise.all([
+    db.order.findMany({
+      where: activeStatus ? { status: activeStatus as (typeof STATUSES)[number] } : undefined,
+      include: {
+        buyer: { select: { email: true, name: true } },
+        store: { select: { name: true } },
+        _count: { select: { items: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 100,
+    }),
+    db.order.count(),
+  ]);
+
+  const revenue = await db.order.aggregate({
+    _sum: { total: true },
+    where: { status: { in: ["PAID", "SHIPPED", "DELIVERED"] } },
   });
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Orders</h1>
-        <div className="flex gap-3 text-sm">
-          <Link href="/admin/stores" className="underline">
-            Stores
-          </Link>
-          <Link href="/admin/products" className="underline">
-            Products
-          </Link>
-        </div>
+    <div className="space-y-6">
+      <PageHeader eyebrow="Admin" title="Orders" subtitle={`${total} total orders`} />
+      <Tabs
+        items={[
+          { href: "/admin/stores", label: "Stores" },
+          { href: "/admin/products", label: "Products" },
+          { href: "/admin/orders", label: "Orders", active: true },
+        ]}
+      />
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+        <Stat label="Total" value={String(total)} sub="All time" />
+        <Stat label="Revenue" value={formatPrice(revenue._sum.total ?? 0)} sub="Paid + shipped + delivered" />
+        <Stat label="Showing" value={String(orders.length)} sub={activeStatus ?? "All statuses"} />
       </div>
 
-      <div className="flex flex-wrap gap-2 text-xs">
+      <div className="flex flex-wrap gap-2 text-xs font-medium">
         <Link
           href="/admin/orders"
-          className={`rounded border px-2 py-1 ${!activeStatus ? "bg-neutral-900 text-white" : ""}`}
+          className={`rounded-full border px-3.5 py-1.5 transition ${!activeStatus ? "border-neutral-900 bg-neutral-900 text-white" : "border-neutral-200 bg-white hover:border-neutral-400"}`}
         >
           All
         </Link>
@@ -62,44 +73,36 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
           <Link
             key={s}
             href={`/admin/orders?status=${s}`}
-            className={`rounded border px-2 py-1 ${activeStatus === s ? "bg-neutral-900 text-white" : ""}`}
+            className={`rounded-full border px-3.5 py-1.5 transition ${activeStatus === s ? "border-neutral-900 bg-neutral-900 text-white" : "border-neutral-200 bg-white hover:border-neutral-400"}`}
           >
             {s}
           </Link>
         ))}
       </div>
 
-      {orders.length === 0 && (
-        <p className="text-sm text-neutral-500">
-          No orders{activeStatus ? ` with status ${activeStatus}` : ""} yet.
-        </p>
+      {orders.length === 0 ? (
+        <EmptyState icon="🧾" title="No orders" text={activeStatus ? `No orders with status ${activeStatus} yet.` : "Orders will show up here."} />
+      ) : (
+        <ul className="divide-y divide-neutral-100 rounded-2xl border border-neutral-200 bg-white">
+          {orders.map((o) => (
+            <li key={o.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
+              <div className="min-w-0">
+                <Link href={`/admin/orders/${o.id}`} className="font-semibold hover:underline">
+                  #{o.id.slice(0, 8)} · {o.store.name}
+                </Link>
+                <p className="truncate text-xs text-neutral-500">
+                  {o.buyer.name ?? o.buyer.email} · {o._count.items} items ·{" "}
+                  {o.createdAt.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <OrderStatusBadge status={o.status} />
+                <span className="font-bold">{formatPrice(o.total)}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
-
-      <ul className="divide-y rounded border">
-        {orders.map((o) => (
-          <li key={o.id} className="flex items-center justify-between gap-4 p-3 text-sm">
-            <div>
-              <Link href={`/admin/orders/${o.id}`} className="font-medium hover:underline">
-                {o.id.slice(0, 8)} · {o.store.name}
-              </Link>
-              <p className="text-neutral-600">
-                {o.buyer.name ?? o.buyer.email} · {o._count.items} items ·{" "}
-                {o.createdAt.toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium">
-                {o.status}
-              </span>
-              <span className="font-medium">{formatPrice(o.total)}</span>
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

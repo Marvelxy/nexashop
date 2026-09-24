@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { currentUser, formatPrice } from "@/lib/permissions";
+import { OrderStatusBadge } from "@/components/dashboard-ui";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -21,53 +22,42 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
   if (!order || order.buyerId !== user.id) notFound();
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <Link href="/orders" className="text-sm text-neutral-600 underline">
+    <div className="mx-auto max-w-2xl space-y-5">
+      <Link href="/orders" className="inline-block rounded-full border border-neutral-200 bg-white px-4 py-1.5 text-sm font-medium transition hover:border-neutral-900">
         ← Back to orders
       </Link>
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Order {order.id.slice(0, 8)}</h1>
-        <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium">
-          {order.status}
-        </span>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-extrabold tracking-tight">Order #{order.id.slice(0, 8)}</h1>
+        <OrderStatusBadge status={order.status} />
       </div>
 
-      <div className="rounded border p-4 text-sm">
+      <div className="rounded-2xl border border-neutral-200 bg-white p-5 text-sm">
         <p className="text-neutral-600">
-          Sold by <span className="font-medium text-neutral-900">{order.store.name}</span>
+          Sold by <span className="font-semibold text-neutral-900">{order.store.name}</span>
         </p>
-        <p className="text-neutral-600">
+        <p className="mt-1 text-neutral-500">
           Placed{" "}
-          {order.createdAt.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
+          {order.createdAt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
         </p>
       </div>
 
-      <ul className="divide-y rounded border">
+      <ul className="divide-y divide-neutral-100 rounded-2xl border border-neutral-200 bg-white">
         {order.items.map((item) => (
           <li key={item.id} className="flex items-center justify-between gap-4 p-4 text-sm">
             <div>
-              <Link
-                href={`/products/${item.product.slug}`}
-                className="font-medium hover:underline"
-              >
+              <Link href={`/products/${item.product.slug}`} className="font-semibold hover:underline">
                 {item.product.name}
               </Link>
-              <p className="text-neutral-500">
-                {formatPrice(item.price)} × {item.quantity}
-              </p>
+              <p className="text-neutral-500">{formatPrice(item.price)} × {item.quantity}</p>
             </div>
-            <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
+            <p className="font-bold">{formatPrice(item.price * item.quantity)}</p>
           </li>
         ))}
       </ul>
 
-      <div className="flex items-center justify-between rounded border p-4">
-        <p className="font-medium">Total</p>
-        <p className="text-lg font-bold">{formatPrice(order.total)}</p>
+      <div className="flex items-center justify-between rounded-2xl border border-neutral-200 bg-white p-5">
+        <p className="font-semibold">Total</p>
+        <p className="text-xl font-extrabold">{formatPrice(order.total)}</p>
       </div>
     </div>
   );

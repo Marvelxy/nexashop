@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { currentUser, formatPrice } from "@/lib/permissions";
 import { OrderStatusForm } from "@/components/order-status-form";
+import { OrderStatusBadge } from "@/components/dashboard-ui";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -23,60 +24,53 @@ export default async function AdminOrderDetailPage({ params }: Props) {
   if (!order) notFound();
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <Link href="/admin/orders" className="text-sm text-neutral-600 underline">
+    <div className="mx-auto max-w-2xl space-y-5">
+      <Link href="/admin/orders" className="inline-block rounded-full border border-neutral-200 bg-white px-4 py-1.5 text-sm font-medium transition hover:border-neutral-900">
         ← Back to orders
       </Link>
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Order {order.id.slice(0, 8)}</h1>
-        <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium">
-          {order.status}
-        </span>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-extrabold tracking-tight">Order #{order.id.slice(0, 8)}</h1>
+        <OrderStatusBadge status={order.status} />
       </div>
 
-      <div className="rounded border p-4 text-sm">
+      <div className="rounded-2xl border border-neutral-200 bg-white p-5 text-sm">
         <p>
-          Buyer: <span className="font-medium">{order.buyer.name ?? order.buyer.email}</span>{" "}
+          Buyer: <span className="font-semibold">{order.buyer.name ?? order.buyer.email}</span>{" "}
           <span className="text-neutral-500">({order.buyer.email})</span>
         </p>
-        <p>
-          Store: <span className="font-medium">{order.store.name}</span>
+        <p className="mt-1">
+          Store: <span className="font-semibold">{order.store.name}</span>
         </p>
-        <p className="text-neutral-600">
+        <p className="mt-1 text-neutral-500">
           Placed{" "}
-          {order.createdAt.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
+          {order.createdAt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
         </p>
       </div>
 
-      <ul className="divide-y rounded border">
+      <ul className="divide-y divide-neutral-100 rounded-2xl border border-neutral-200 bg-white">
         {order.items.map((item) => (
-          <li key={item.id} className="flex items-center justify-between gap-4 p-3 text-sm">
+          <li key={item.id} className="flex items-center justify-between gap-4 p-4 text-sm">
             <div>
-              <p className="font-medium">{item.product.name}</p>
-              <p className="text-neutral-500">
-                {formatPrice(item.price)} × {item.quantity}
-              </p>
+              <p className="font-semibold">{item.product.name}</p>
+              <p className="text-neutral-500">{formatPrice(item.price)} × {item.quantity}</p>
             </div>
-            <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
+            <p className="font-bold">{formatPrice(item.price * item.quantity)}</p>
           </li>
         ))}
       </ul>
 
-      <div className="flex items-center justify-between rounded border p-4">
-        <p className="font-medium">Total</p>
-        <p className="text-lg font-bold">{formatPrice(order.total)}</p>
+      <div className="flex items-center justify-between rounded-2xl border border-neutral-200 bg-white p-5">
+        <p className="font-semibold">Total</p>
+        <p className="text-xl font-extrabold">{formatPrice(order.total)}</p>
       </div>
 
-      <div className="rounded border p-4">
-        <h2 className="mb-2 text-sm font-medium">Manage order</h2>
-        <OrderStatusForm orderId={order.id} current={order.status} />
+      <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+        <h2 className="font-semibold">Manage order</h2>
+        <div className="mt-2">
+          <OrderStatusForm orderId={order.id} current={order.status} />
+        </div>
         <p className="mt-2 text-xs text-neutral-500">
-          Cancelling or refunding a paid order restores stock. Marking a pending
-          order paid deducts stock (blocked if insufficient).
+          Cancelling or refunding a paid order restores stock. Marking a pending order paid deducts stock (blocked if insufficient).
         </p>
       </div>
     </div>

@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { currentUser, formatPrice } from "@/lib/permissions";
+import { currentUser } from "@/lib/permissions";
+import { formatDisplayPrice } from "@/lib/currency-preference";
+import { DisplayPrice } from "@/components/display-price";
 import { EmptyState, OrderStatusBadge, PageHeader, Stat } from "@/components/dashboard-ui";
 
 export default async function BuyerOrdersPage() {
@@ -50,7 +52,7 @@ export default async function BuyerOrdersPage() {
       />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Orders" value={String(orders.length)} sub="Last 50" />
-        <Stat label="Total spent" value={formatPrice(totalSpent)} sub="Excl. cancelled" />
+        <Stat label="Total spent" value={await formatDisplayPrice(totalSpent)} sub="Excl. cancelled" />
         <Stat label="In transit" value={String(active)} sub="Pending → shipped" />
       </div>
       <ul className="space-y-3">
@@ -69,7 +71,7 @@ export default async function BuyerOrdersPage() {
               {o.items.slice(0, 3).map((item) => (
                 <li key={item.id} className="flex justify-between gap-4">
                   <span className="truncate">{item.product.name} × {item.quantity}</span>
-                  <span className="shrink-0 font-medium text-neutral-900">{formatPrice(item.price * item.quantity)}</span>
+                  <span className="shrink-0 font-medium text-neutral-900"><DisplayPrice value={item.price * item.quantity} /></span>
                 </li>
               ))}
               {o.items.length > 3 && (
@@ -80,7 +82,7 @@ export default async function BuyerOrdersPage() {
               <Link href={`/orders/${o.id}`} className="rounded-full border border-neutral-200 px-4 py-1.5 text-xs font-medium transition hover:border-neutral-900">
                 View details →
               </Link>
-              <p className="text-lg font-extrabold">{formatPrice(o.total)}</p>
+              <p className="text-lg font-extrabold"><DisplayPrice value={o.total} /></p>
             </div>
           </li>
         ))}

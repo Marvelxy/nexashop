@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { getDetailedCart } from "@/lib/cart";
-import { formatPrice } from "@/lib/permissions";
+import { getFreeShippingThresholdCents } from "@/lib/currency";
+import { DisplayPrice } from "@/components/display-price";
 import {
   CartQtyForm,
   CartRemoveButton,
 } from "@/components/cart-line-controls";
 import { EmptyState, PageHeader } from "@/components/dashboard-ui";
 
-const FREE_SHIPPING_THRESHOLD = 5000; // cents
+const FREE_SHIPPING_THRESHOLD = getFreeShippingThresholdCents(); // minor units
 
 export default async function CartPage() {
   const { lines, subtotal, count } = await getDetailedCart();
@@ -50,7 +51,7 @@ export default async function CartPage() {
 
       <div className="rounded-2xl border border-neutral-200 bg-white p-4">
         {remaining > 0 ? (
-          <p className="text-sm">Add <span className="font-bold">{formatPrice(remaining)}</span> more for free shipping</p>
+          <p className="text-sm">Add <span className="font-bold"><DisplayPrice value={remaining} /></span> more for free shipping</p>
         ) : (
           <p className="text-sm font-semibold text-emerald-700">🎉 You unlocked free shipping</p>
         )}
@@ -90,7 +91,7 @@ export default async function CartPage() {
                     </div>
                     <CartRemoveButton productId={product.id} />
                   </div>
-                  <p className="text-sm text-neutral-500">{formatPrice(product.price)} each</p>
+                  <p className="text-sm text-neutral-500"><DisplayPrice value={product.price} /> each</p>
                   {outOfStock && (
                     <p className="rounded-xl bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700">
                       Out of stock — remove it or wait for restock.
@@ -106,7 +107,7 @@ export default async function CartPage() {
                   )}
                   <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
                     <CartQtyForm productId={product.id} qty={qty} max={Math.max(product.stock, qty)} />
-                    <p className="font-bold">{formatPrice(product.price * qty)}</p>
+                    <p className="font-bold"><DisplayPrice value={product.price * qty} /></p>
                   </div>
                 </div>
               </li>
@@ -119,7 +120,7 @@ export default async function CartPage() {
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between text-neutral-600">
               <dt>Items ({count})</dt>
-              <dd>{formatPrice(subtotal)}</dd>
+              <dd><DisplayPrice value={subtotal} /></dd>
             </div>
             <div className="flex justify-between text-neutral-600">
               <dt>Shipping</dt>
@@ -127,7 +128,7 @@ export default async function CartPage() {
             </div>
             <div className="flex justify-between border-t border-neutral-100 pt-3 text-base font-extrabold">
               <dt>Subtotal</dt>
-              <dd>{formatPrice(subtotal)}</dd>
+              <dd><DisplayPrice value={subtotal} /></dd>
             </div>
           </dl>
           <Link href="/checkout" className="block rounded-full bg-neutral-900 py-3 text-center text-sm font-semibold text-white transition hover:bg-neutral-700">

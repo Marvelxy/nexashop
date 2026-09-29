@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { signOut } from "@/lib/auth";
 import { UserMenu } from "@/components/user-menu";
+import { CurrencySelector } from "@/components/currency-selector";
+import { getFreeShippingThresholdCents } from "@/lib/currency";
+import { DisplayPrice } from "@/components/display-price";
 
 export type HeaderUser = {
   id: string;
@@ -43,10 +46,12 @@ export function SiteHeader({
   user,
   categories,
   cartCount,
+  currency,
 }: {
   user: HeaderUser | null;
   categories: HeaderCategory[];
   cartCount: number;
+  currency: string;
 }) {
   return (
     <header className="sticky top-0 z-40">
@@ -54,9 +59,12 @@ export function SiteHeader({
       <div className="bg-neutral-950 text-neutral-200">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 text-xs">
           <p className="truncate">
-            Free shipping over $50 · Secure Stripe checkout
+            Free shipping over{" "}
+            <DisplayPrice value={getFreeShippingThresholdCents()} /> · Secure
+            Stripe checkout
           </p>
           <div className="hidden items-center gap-4 sm:flex">
+            <CurrencySelector value={currency} />
             <Link href="/become-seller" className="transition hover:text-white">
               Become a seller
             </Link>
@@ -112,6 +120,13 @@ export function SiteHeader({
                 ))}
               </div>
               <div className="mt-3 space-y-1 border-t pt-3">
+                <div className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm">
+                  <span className="font-medium text-neutral-600">Currency</span>
+                  <CurrencySelector
+                    value={currency}
+                    className="cursor-pointer rounded-full border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-900 transition hover:border-neutral-900 disabled:opacity-50"
+                  />
+                </div>
                 <Link href="/cart" className="block rounded-xl px-3 py-2.5 text-sm transition hover:bg-neutral-100">
                   Cart{cartCount > 0 ? ` (${cartCount})` : ""}
                 </Link>

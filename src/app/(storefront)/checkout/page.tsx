@@ -2,6 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getDetailedCart } from "@/lib/cart";
 import { currentUser, formatPrice } from "@/lib/permissions";
+import { getDefaultCurrency } from "@/lib/currency";
+import {
+  getDisplayCurrency,
+} from "@/lib/currency-preference";
+import { DisplayPrice } from "@/components/display-price";
 import { isStripeConfigured } from "@/lib/stripe";
 import { CheckoutForm } from "@/components/checkout-form";
 
@@ -11,6 +16,9 @@ export default async function CheckoutPage() {
 
   const { lines, subtotal, count } = await getDetailedCart();
   if (lines.length === 0) redirect("/cart");
+
+  const currency = await getDisplayCurrency();
+  const shopCurrency = getDefaultCurrency();
 
   const byStore = new Map<string, typeof lines>();
   for (const line of lines) {
@@ -35,7 +43,7 @@ export default async function CheckoutPage() {
                   <span>
                     {product.name} × {qty}
                   </span>
-                  <span>{formatPrice(product.price * qty)}</span>
+                  <span><DisplayPrice value={product.price * qty} /></span>
                 </li>
               ))}
             </ul>
@@ -43,8 +51,18 @@ export default async function CheckoutPage() {
         ))}
         <div className="flex justify-between border-t pt-3 font-medium">
           <span>Total</span>
-          <span>{formatPrice(subtotal)}</span>
+          <span><DisplayPrice value={subtotal} /></span>
         </div>
+        {currency !== shopCurrency ? (
+          <p className="text-xs text-neutral-500">
+            Converted to {currency} at today&apos;s rate — you&apos;ll be
+            charged {formatPrice(subtotal)} ({shopCurrency}).
+          </p>
+        ) : (
+          <p className="text-xs text-neutral-500">
+            Charged in {shopCurrency}.
+          </p>
+        )}
         <p className="text-xs text-neutral-500">
           Ordering as {user.email}. One order is created per seller.
         </p>

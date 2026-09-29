@@ -4,13 +4,17 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireSeller } from "@/lib/permissions";
+import { toMinorUnits } from "@/lib/currency";
 
 export type ProductState = { error?: string; success?: string };
 
 const baseSchema = z.object({
   name: z.string().min(3).max(100),
   description: z.string().min(10),
-  price: z.coerce.number().min(1).transform((v) => Math.round(v * 100)),
+  price: z.coerce
+    .number()
+    .min(1)
+    .transform((v) => toMinorUnits(v)),
   stock: z.coerce.number().int().min(0),
   categoryId: z.string().optional().transform((v) => v || undefined),
   images: z

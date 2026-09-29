@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { currentUser, formatPrice } from "@/lib/permissions";
+import { currentUser } from "@/lib/permissions";
+import { DisplayPrice } from "@/components/display-price";
 import { OrderStatusBadge } from "@/components/dashboard-ui";
 
 type Props = { params: Promise<{ id: string }> };
@@ -48,16 +49,16 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
               <Link href={`/products/${item.product.slug}`} className="font-semibold hover:underline">
                 {item.product.name}
               </Link>
-              <p className="text-neutral-500">{formatPrice(item.price)} × {item.quantity}</p>
+              <p className="text-neutral-500"><DisplayPrice value={item.price} /> × {item.quantity}</p>
             </div>
-            <p className="font-bold">{formatPrice(item.price * item.quantity)}</p>
+            <p className="font-bold"><DisplayPrice value={item.price * item.quantity} /></p>
           </li>
         ))}
       </ul>
 
       <div className="flex items-center justify-between rounded-2xl border border-neutral-200 bg-white p-5">
         <p className="font-semibold">Total</p>
-        <p className="text-xl font-extrabold">{formatPrice(order.total)}</p>
+        <p className="text-xl font-extrabold"><DisplayPrice value={order.total} /></p>
       </div>
     </div>
   );

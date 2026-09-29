@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Pencil1Icon } from "@radix-ui/react-icons";
-import { formatPrice, currentUser } from "@/lib/permissions";
+import { currentUser } from "@/lib/permissions";
+import { DisplayPrice } from "@/components/display-price";
 import { AddToCartForm } from "@/components/add-to-cart-form";
 import { StockBadge, isOutOfStock } from "@/components/stock-badge";
 
@@ -97,7 +98,7 @@ export default async function ProductPage({ params }: Props) {
           )}
         </div>
         <h1 className="text-2xl font-bold">{product.name}</h1>
-        <p className="text-xl">{formatPrice(product.price)}</p>
+        <p className="text-xl"><DisplayPrice value={product.price} /></p>
         <div className="flex items-center gap-2">
           <StockBadge stock={product.stock} />
           <p className="text-sm text-neutral-500">Stock: {product.stock}</p>

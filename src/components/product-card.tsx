@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Pencil1Icon } from "@radix-ui/react-icons";
-import { formatPrice } from "@/lib/permissions";
+import { DisplayPrice } from "@/components/display-price";
 import { QuickAddButton } from "@/components/add-to-cart-form";
 import { StockBadge, isOutOfStock } from "@/components/stock-badge";
 
@@ -77,7 +77,7 @@ export function ProductCard({
         </h3>
         <div className="mt-auto flex items-center justify-between pt-2">
           <p className="text-lg font-bold tracking-tight">
-            {formatPrice(product.price)}
+            <DisplayPrice value={product.price} />
           </p>
         </div>
         <div className="[&_button]:rounded-full [&_button]:bg-neutral-900 [&_button]:py-2 [&_button]:font-medium [&_button]:text-white [&_button]:transition [&_button]:hover:bg-neutral-700">

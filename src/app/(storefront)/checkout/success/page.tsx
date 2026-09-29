@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
-import { currentUser, formatPrice } from "@/lib/permissions";
+import { currentUser } from "@/lib/permissions";
+import { DisplayPrice } from "@/components/display-price";
 import { CART_COOKIE_NAME } from "@/lib/cart";
 import { OrderStatusBadge } from "@/components/dashboard-ui";
 
@@ -83,7 +84,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
               </div>
               <div>
                 <dt className="text-neutral-400">Total</dt>
-                <dd className="text-xl font-bold">{formatPrice(totalPaid)}</dd>
+                <dd className="text-xl font-bold"><DisplayPrice value={totalPaid} /></dd>
               </div>
             </dl>
           )}
@@ -123,7 +124,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
                       {item.product.name} × {item.quantity}
                     </span>
                     <span className="shrink-0 font-medium text-neutral-900">
-                      {formatPrice(item.price * item.quantity)}
+                      <DisplayPrice value={item.price * item.quantity} />
                     </span>
                   </li>
                 ))}
@@ -132,7 +133,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
                 <Link href={`/orders/${o.id}`} className="rounded-full border border-neutral-200 px-4 py-1.5 text-xs font-medium transition hover:border-neutral-900">
                   View details →
                 </Link>
-                <p className="text-lg font-extrabold">{formatPrice(o.total)}</p>
+                <p className="text-lg font-extrabold"><DisplayPrice value={o.total} /></p>
               </div>
             </div>
           ))}

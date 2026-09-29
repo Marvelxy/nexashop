@@ -7,6 +7,7 @@ import {
   updateProduct,
   type ProductState,
 } from "@/actions/product";
+import { getCurrencySymbol, getDefaultCurrency } from "@/lib/currency";
 
 type Category = { id: string; name: string };
 
@@ -122,7 +123,7 @@ export function ProductForm({
 
       <div className="grid grid-cols-2 gap-4">
         <label className="block text-sm">
-          Price ($)
+          Price ({getCurrencySymbol()} · {getDefaultCurrency()})
           <input
             name="price"
             type="number"

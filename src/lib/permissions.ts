@@ -1,5 +1,9 @@
 import { auth } from "./auth";
 import { db } from "./db";
+import {
+  formatPrice as formatPriceIntl,
+  type FormatPriceOptions,
+} from "./currency";
 
 export async function currentUser() {
   const session = await auth();
@@ -26,9 +30,20 @@ export async function requireAdmin() {
   return { user };
 }
 
-export function formatPrice(cents: number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  }).format(cents / 100);
+/**
+ * Backwards-compatible wrapper around {@link formatPriceIntl}.
+ * Accepts a legacy `(cents, "USD")` pair or a `{ currency, locale }` object.
+ */
+export function formatPrice(
+  cents: number,
+  currencyOrOptions?: string | FormatPriceOptions | null,
+  locale?: string | null,
+) {
+  if (typeof currencyOrOptions === "string" || currencyOrOptions == null) {
+    return formatPriceIntl(cents, {
+      currency: currencyOrOptions ?? undefined,
+      locale: locale ?? undefined,
+    });
+  }
+  return formatPriceIntl(cents, currencyOrOptions);
 }

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/permissions";
+import { getStripeCurrency } from "@/lib/currency";
 import { CART_COOKIE_NAME, getDetailedCart } from "@/lib/cart";
 import { stripe, isStripeConfigured } from "@/lib/stripe";
 
@@ -128,7 +129,7 @@ export async function createCheckoutSession(
       customer_email: user.email ?? undefined,
       line_items: lines.map((l) => ({
         price_data: {
-          currency: "usd",
+          currency: getStripeCurrency(),
           product_data: {
             name: `${l.product.name} (${l.product.store.name})`,
           },

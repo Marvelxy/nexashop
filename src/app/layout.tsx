@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteHeader, type HeaderUser } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { currentUser } from "@/lib/permissions";
+import { getDisplayCurrency } from "@/lib/currency-preference";
 import { getCartCount } from "@/lib/cart";
 import { db } from "@/lib/db";
 import "./globals.css";
@@ -12,10 +13,11 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [user, categories, cartCount] = await Promise.all([
+  const [user, categories, cartCount, currency] = await Promise.all([
     currentUser(),
     db.category.findMany({ orderBy: { name: "asc" } }),
     getCartCount(),
+    getDisplayCurrency(),
   ]);
 
   const headerUser: HeaderUser | null = user
@@ -34,7 +36,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         className="min-h-screen bg-white text-neutral-900 antialiased"
         suppressHydrationWarning
       >
-        <SiteHeader user={headerUser} categories={categories} cartCount={cartCount} />
+        <SiteHeader user={headerUser} categories={categories} cartCount={cartCount} currency={currency} />
         <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
         <SiteFooter categories={categories} />
       </body>
